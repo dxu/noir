@@ -2,15 +2,204 @@ pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
 package={loaded={},_c={}}
-package._c["sample"]=function()
-local samplepackage = {
-  samplefunc = function()
-   rectfill(0,0,127,127,5)
-   circfill(x,y,7,14)
-  end
+package._c["level"]=function()
+scene = require('lib/scene')
+player = require('player')
+
+-- inherit from the base scene
+level = scene:new()
+
+function level:initialize()
+-- create the player and the platforms
+	local player = player:new()
+	self:add(player)
+end
+
+function level:update()
+-- update logic for a level on each tick
+end
+
+function level:draw()
+ rectfill(0,0,127,127,5)
+end
+
+return level
+end
+package._c["lib/scene"]=function()
+-- log = require('log')
+-- the base class for creating a scene
+local scene = {
+  entities = {},
 }
 
-return samplepackage
+function scene:new (o)
+  o = o or {}   -- create object if user does not provide one
+  setmetatable(o, self)
+  self.__index = self
+  return o
+end
+
+function scene:add (entity)
+	add(self.entities, entity)
+	entity:initialize()
+end
+
+function scene:initialize()
+  log('ERROR: scene:initialize is required')
+end
+
+function scene:update()
+  log('ERROR: scene:update is required')
+end
+
+function scene:_update()
+	self:update()
+	for k,v in pairs(self.entities) do v:update() end
+end
+
+
+-- for drawing background
+function scene:draw()
+  log('ERROR: scene:draw is required')
+end
+
+-- just cycle through all entities and draw them
+function scene:_draw()
+	self.draw()
+	for k,v in pairs(self.entities) do v:draw() end
+end
+
+return scene
+end
+package._c["player"]=function()
+ent = require('lib/ent')
+
+-- inherit from the base scene
+player = ent:new({
+	x=64,
+	y=64
+})
+
+function player:initialize()
+-- create the player and the platforms
+end
+
+function player:update()
+-- update logic for a player on each tick
+ if (btn(0)) then self.x=self.x-1 end
+ if (btn(1)) then self.x=self.x+1 end
+ if (btn(2)) then self.y=self.y-1 end
+ if (btn(3)) then self.y=self.y+1 end
+end
+
+function player:draw()
+  circfill(self.x,self.y,7,14)
+end
+
+return player
+end
+package._c["lib/ent"]=function()
+log = require('../util/log')
+-- the base class for creating an entity
+local ent = {
+	x = 0,
+	y = 0,
+}
+
+function ent:new (o)
+  o = o or {}   -- create object if user does not provide one
+  setmetatable(o, self)
+  self.__index = self
+  return o
+end
+
+function ent:initialize()
+  log('ERROR: ent:initialize is required')
+end
+
+function ent:update()
+  log('ERROR: ent:update is required')
+end
+
+-- just cycle through all entities and draw them
+function ent:draw ()
+  log('ERROR: ent:draw is required')
+end
+
+return ent
+end
+package._c["../util/log"]=function()
+require('tostring')
+function log(stuff)
+  printh(''..tostring(stuff))
+end
+return log
+end
+package._c["tostring"]=function()
+-- converts anything to string, even nested tables
+function tostring(any)
+    if type(any)=="function" then
+        return "function"
+    end
+    if any==nil then
+        return "nil"
+    end
+    if type(any)=="string" then
+        return any
+    end
+    if type(any)=="boolean" then
+        if any then return "true" end
+        return "false"
+    end
+    if type(any)=="table" then
+        local str = "{ "
+        for k,v in pairs(any) do
+            str=str..tostring(k).."->"..tostring(v).." "
+        end
+        return str.."}"
+    end
+    if type(any)=="number" then
+        return ""..any
+    end
+    return "Type unrecognized!!" -- should never show
+end
+
+return tostring
+end
+package._c["lib/world"]=function()
+local world = {
+  current_scene,
+}
+
+function world:new (o)
+  o = o or {}   -- create object if user does not provide one
+  setmetatable(o, self)
+  self.__index = self
+  return o
+end
+
+function world:load_scene (scene)
+  self.current_scene = scene
+  self.current_scene:initialize()
+end
+
+function world:_update()
+	self.current_scene:_update()
+end
+
+function world:_draw()
+  -- if there is no current scene, we should throw an error
+  self.current_scene:_draw()
+end
+
+return world
+end
+package._c["util/log"]=function()
+require('tostring')
+function log(stuff)
+  printh(''..tostring(stuff))
+end
+return log
 end
 function require(p)
 local l=package.loaded
@@ -18,18 +207,36 @@ if (l[p]==nil) l[p]=package._c[p]()
 if (l[p]==nil) l[p]=true
 return l[p]
 end
-samplepackage = require('sample')
+level = require('level')
+world = require('lib/world')
+log = require('util/log')
+
+local current_scene
+
+function initialize()
+  -- local level1 =
+	world:new()
+	-- create a level
+	local level1 = level:new()
+	log('level1')
+	log(level1)
+	log('hello')
+	world:load_scene(level1)
+	log('world')
+	log(world.current_scene)
+	-- log(world)
+end
+
+initialize()
 
 x = 64  y = 64
 function _update()
- if (btn(0)) then x=x-1 end
- if (btn(1)) then x=x+1 end
- if (btn(2)) then y=y-1 end
- if (btn(3)) then y=y+1 end
+	world:_update()
 end
 
 function _draw()
-  samplepackage.samplefunc()
+	-- rectfill(0,0,127,127,5)
+	world:_draw()
 end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
