@@ -1,22 +1,31 @@
-factory = require('scene')
-log = require('log')
+level = require('level')
+world = require('lib/world')
+log = require('util/log')
 
 local current_scene
 
 function initialize()
- local level1 = factory.create(14)
+  -- local level1 =
+	world:new()
+	-- create a level
+	local level1 = level:new()
+	log('level1')
+	log(level1)
+	log('hello')
+	world:load_scene(level1)
+	log('world')
+	log(world.current_scene)
+	-- log(world)
 end
 
 initialize()
 
 x = 64  y = 64
 function _update()
- if (btn(0)) then x=x-1 end
- if (btn(1)) then x=x+1 end
- if (btn(2)) then y=y-1 end
- if (btn(3)) then y=y+1 end
+	world:_update()
 end
 
 function _draw()
- rectfill(0,0,127,127,5)
+	-- rectfill(0,0,127,127,5)
+	world:_draw()
 end
