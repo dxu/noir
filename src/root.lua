@@ -1,4 +1,13 @@
-samplepackage = require('sample')
+factory = require('scene')
+log = require('log')
+
+local current_scene
+
+function initialize()
+ local level1 = factory.create(14)
+end
+
+initialize()
 
 x = 64  y = 64
 function _update()
@@ -9,5 +18,5 @@ function _update()
 end
 
 function _draw()
-  samplepackage.samplefunc()
+ rectfill(0,0,127,127,5)
 end

@@ -14,9 +14,17 @@ function scene:add (entity)
   self.entities.insert(entity)
 end
 
+function scene:draw ()
+end
+
+local ss = scene:new()
+
 local scene_factory = {
-  create = function(gravity)
-    return scene:new();
+  create = function (gravity)
+    local scene2 = scene:new({
+      grav = gravity
+    })
+		return scene2
   end
 }
 
