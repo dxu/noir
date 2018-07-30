@@ -11,10 +11,16 @@ end
 
 function world:load_scene (scene)
   self.current_scene = scene
+  self.current_scene:initialize()
 end
 
-function world:draw()
-  self.current_scene.draw()
+function world:_update()
+	self.current_scene:_update()
 end
 
-return world:new()
+function world:_draw()
+  -- if there is no current scene, we should throw an error
+  self.current_scene:_draw()
+end
+
+return world
