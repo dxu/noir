@@ -1,17 +1,15 @@
-<div align="center">
-  <img alt="Yarn" src="https://github.com/dxu/assets/raw/master/pico-starter.svg?sanitize=true" width="800">
-</div>
-
 <p align="center">
-  Your friendly neighborhood PICO-8 starter kit
+  noir
 </p>
-
-## Features
-- **Automated multi-file builds** with [picotool](https://github.com/dansanderson/picotool) and a filesystem watcher
 
 ## Dependencies
 
-To use pico-starter, you will need a few pre-requisite dependencies:
+Github:
+1. Sign up for Github
+2. Add your ssh key: https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
+3. Clone this repository onto your desktop `git clone git@github.com:dxu/noir.git`
+
+To develop noir, you will need a few pre-requisite dependencies:
 
 **[Yarn](https://yarnpkg.com/en/docs/install#mac-stable)** - Used as a task runner and watcher to automate `picotool build`
 
@@ -24,9 +22,7 @@ pico-starter takes your `src/` directory, and rebuilds the output `.p8` file (de
 ### Setup
 
 - Before doing anything else, make sure you have installed the necessary **Dependencies** listed above.
-- `git clone` this repository.
-- `cd` into the repository.
-- Run `yarn` to fetch the external packages used.
+- Run `yarn` in the root directory to fetch the external packages used.
 
 ### Rebuild your cart
 
@@ -48,4 +44,6 @@ pico-starter takes your `src/` directory, and rebuilds the output `.p8` file (de
 - Some potential options could be:
   - Clone this repository directly into your carts folder
   - Hard link your `.p8` into your carts folder
+    - `ln -s noir.p8 CART_DIRECTORY`. My cart directory is located at `/Users/dxu/Library/Application Support/pico-8`
   - Manually (or automatically) copy it yourself
+- Once you've done one of the above, you should be able to start up PICO8 and run the build cart! If you've hard-linked the file, then it will automatically pick up the changes if you run `yarn watch`
