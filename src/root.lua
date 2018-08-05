@@ -1,12 +1,12 @@
-level = require('level')
-world = require('lib/world')
-log = require('util/log')
+local level = require('level')
+local world_lib = require('lib/world')
+local log = require('util/log')
 
 local current_scene
 
+world = world_lib:new()
+
 function initialize()
-  -- local level1 =
-	world:new()
 	-- create a level
 	local level1 = level:new()
 	log('level1')
