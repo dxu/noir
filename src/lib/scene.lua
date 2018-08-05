@@ -25,8 +25,8 @@ function scene:update()
 end
 
 function scene:_update()
-	self:update()
 	for k,v in pairs(self.entities) do v:update() end
+	self:update()
 end
 
 
