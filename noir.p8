@@ -12,11 +12,27 @@ level = scene:new()
 function level:initialize()
 -- create the player and the platforms
 	local player = player:new()
+  self.gravity = 2
 	self:add(player)
 end
 
 function level:update()
--- update logic for a level on each tick
+  -- update gravity
+	for k,ent in pairs(self.entities) do
+    if not ent.grounded then
+      local new_position = ent.y + self.gravity
+      -- if new_position and the ent's height go below ground,
+      -- move them back up and don't modify
+      if ent.y + ent.height >= 128 then
+        ent.y = 128 - ent.height
+        ent.vel_y = 0
+        ent.acc_y = 0
+        ent.grounded = true
+      else
+        ent.y = new_position
+      end
+    end
+  end
 end
 
 function level:draw()
@@ -53,8 +69,8 @@ function scene:update()
 end
 
 function scene:_update()
-	self:update()
 	for k,v in pairs(self.entities) do v:update() end
+	self:update()
 end
 
 
@@ -73,11 +89,19 @@ return scene
 end
 package._c["player"]=function()
 ent = require('lib/ent')
+local log = require('util/log')
 
 -- inherit from the base scene
 player = ent:new({
 	x=64,
-	y=64
+	y=64,
+  height=7,
+  width=3,
+  vel_x=0,
+  vel_y=0,
+  acc_x=0,
+  acc_y=0,
+  grounded=false,
 })
 
 function player:initialize()
@@ -88,12 +112,33 @@ function player:update()
 -- update logic for a player on each tick
  if (btn(0)) then self.x=self.x-1 end
  if (btn(1)) then self.x=self.x+1 end
- if (btn(2)) then self.y=self.y-1 end
- if (btn(3)) then self.y=self.y+1 end
+ if (btnp(2)) then
+   self.vel_y = self.vel_y+6
+   self.grounded = false
+ end
+ -- if (btn(3)) then self.y=self.y+1 end
+
+ if not self.grounded then
+   log('hello')
+   log(self.y)
+   self.vel_x = self.vel_x + self.acc_x;
+   self.vel_y = self.vel_y - self.acc_y;
+   self.acc_y = self.acc_y + world.current_scene.gravity / 20
+   self.x = self.x + self.vel_x;
+   self.y = self.y - self.vel_y;
+ end
 end
 
 function player:draw()
-  circfill(self.x,self.y,7,14)
+  -- log(self.y - self.height / 2)
+  log(self.y)
+  rectfill(
+    self.x - self.width / 2,
+    self.y - self.height / 2,
+    self.x + self.width / 2,
+    self.y + self.height / 2,
+    14
+  )
 end
 
 return player
@@ -166,6 +211,13 @@ end
 
 return tostring
 end
+package._c["util/log"]=function()
+require('tostring')
+function log(stuff)
+  printh(''..tostring(stuff))
+end
+return log
+end
 package._c["lib/world"]=function()
 local world = {
   current_scene,
@@ -194,28 +246,21 @@ end
 
 return world
 end
-package._c["util/log"]=function()
-require('tostring')
-function log(stuff)
-  printh(''..tostring(stuff))
-end
-return log
-end
 function require(p)
 local l=package.loaded
 if (l[p]==nil) l[p]=package._c[p]()
 if (l[p]==nil) l[p]=true
 return l[p]
 end
-level = require('level')
-world = require('lib/world')
-log = require('util/log')
+local level = require('level')
+local world_lib = require('lib/world')
+local log = require('util/log')
 
 local current_scene
 
+world = world_lib:new()
+
 function initialize()
-  -- local level1 =
-	world:new()
 	-- create a level
 	local level1 = level:new()
 	log('level1')
